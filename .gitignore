@@ -19,8 +19,7 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# SQLite local database & journals
-prisma/*.db
+# SQLite local journal files (keep prisma/dev.db tracked for instant Vercel demo deployment)
 prisma/*.db-journal
 
 # Microsoft Office temporary lock files

@@ -4,6 +4,11 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
+  experimental: {
+    outputFileTracingIncludes: {
+      "/api/**/*": ["./prisma/dev.db"],
+    },
+  },
   webpack: (config) => {
     config.resolve.fallback = { fs: false, path: false };
     return config;

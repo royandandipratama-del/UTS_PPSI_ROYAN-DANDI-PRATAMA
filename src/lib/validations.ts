@@ -17,7 +17,9 @@ export const reportSchema = z.object({
     })
     .min(1, "Foto bukti wajib diunggah")
     .refine(
-      (val) => val.startsWith("/uploads/") && !val.includes(".."),
+      (val) =>
+        (val.startsWith("/uploads/") && !val.includes("..")) ||
+        /^data:image\/(jpeg|jpg|png|webp);base64,[A-Za-z0-9+/=]+$/.test(val),
       "Path foto bukti harus berasal dari direktori unggahan resmi (/uploads/)"
     ),
   lat: z.number({
@@ -92,7 +94,9 @@ export const statusUpdateSchema = z.object({
         .string()
         .min(1, "Foto bukti perbaikan wajib diunggah")
         .refine(
-          (val) => val.startsWith("/uploads/") && !val.includes(".."),
+          (val) =>
+            (val.startsWith("/uploads/") && !val.includes("..")) ||
+            /^data:image\/(jpeg|jpg|png|webp);base64,[A-Za-z0-9+/=]+$/.test(val),
           "Path foto bukti perbaikan harus berasal dari direktori unggahan resmi (/uploads/)"
         ),
       catatan: z

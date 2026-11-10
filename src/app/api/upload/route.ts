@@ -94,6 +94,16 @@ export async function POST(req: Request) {
     // Buat nama file unik dengan ekstensi terverifikasi
     const uniqueName = `lapor_${Date.now()}_${crypto.randomBytes(6).toString("hex")}.${safeExt}`;
 
+    // Pada lingkungan Vercel Serverless, filesystem /var/task bersifat read-only.
+    // Gunakan Data URL terverifikasi jika direktori public/uploads tidak dapat ditulis.
+    if (process.env.VERCEL) {
+      const mimeType = safeExt === "jpg" ? "image/jpeg" : `image/${safeExt}`;
+      return NextResponse.json({
+        message: "Foto berhasil diunggah",
+        url: `data:${mimeType};base64,${buffer.toString("base64")}`,
+      });
+    }
+
     const uploadDir = path.join(process.cwd(), "public", "uploads");
     await mkdir(uploadDir, { recursive: true });
     const filePath = path.join(uploadDir, uniqueName);
