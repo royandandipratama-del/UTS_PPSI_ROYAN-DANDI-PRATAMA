@@ -1,0 +1,148 @@
+// Prisma Schema untuk LaporWarga - Portal Pengaduan Infrastruktur Warga Bandar Lampung
+// 
+// =========================================================================================
+// PANDUAN MIGRASI KE POSTGRESQL + POSTGIS (PRODUKSI):
+// -----------------------------------------------------------------------------------------
+// Saat ini basis data menggunakan SQLite lokal untuk kemudahan pengembangan tanpa dependensi luar.
+// Untuk migrasi ke PostgreSQL + PostGIS di lingkungan produksi skala perkotaan:
+// 1. Ubah datasource db:
+//      provider = "postgresql"
+//      url      = env("DATABASE_URL")
+// 2. Aktifkan ekstensi PostGIS di database PostgreSQL:
+//      CREATE EXTENSION IF NOT EXISTS postgis;
+// 3. Kolom `lat` dan `lng` (Float) dapat digantikan atau diperkaya dengan kolom geometri native:
+//      lokasi Unsupported("geometry(Point, 4326)")?
+// 4. Buat Spatial Index (GIST) untuk kueri spasial sub-milidetik:
+//      CREATE INDEX idx_reports_geom ON "Report" USING GIST (lokasi);
+// 5. Migrasi query titik panas & radius dengan PostGIS:
+//      - Radius deteksi laporan ganda:
+//        ST_DWithin(lokasi, ST_SetSRID(ST_MakePoint(lng, lat), 4326)::geography, 15)
+//      - Agregasi titik panas (Heatmap Grid 500m):
+//        ST_SnapToGrid(lokasi, 0.005, 0.005) atau ST_ClusterDBSCAN()
+// =========================================================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String          @id @default(uuid())
+  nama         String
+  email        String          @unique
+  passwordHash String
+  role         String          @default("warga") // "warga", "petugas", "admin"
+  noTelepon    String?
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+
+  reports       Report[]        @relation("UserReports")
+  votes         Vote[]
+  statusChanges StatusHistory[] @relation("UserStatusChanges")
+  notifications Notification[]
+}
+
+model Category {
+  id        String   @id @default(uuid())
+  nama      String   @unique
+  ikon      String   // Nama ikon Material Symbols Outlined (mis. construction, lightbulb)
+  deskripsi String?
+  reports   Report[]
+}
+
+model Report {
+  id          String   @id @default(uuid())
+  ticketCode  String   @unique // format: #TKT-XXXX
+  categoryId  String
+  deskripsi   String
+  fotoUrl     String
+  lat         Float
+  lng         Float
+  alamat      String
+  kecamatan   String   // Kedaton, Rajabasa, Tanjung Karang, Teluk Betung, Labuhan Ratu, Way Halim, dll.
+  status      String   @default("Menunggu") // "Menunggu", "Diproses", "Sedang Dikerjakan", "Selesai", "Diarsipkan"
+  prioritas   String   @default("P3 Rutin") // "P1 Kritis", "P2 Mendesak", "P3 Rutin"
+  createdById String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  category        Category         @relation(fields: [categoryId], references: [id])
+  createdBy       User?            @relation("UserReports", fields: [createdById], references: [id], onDelete: SetNull)
+  votes           Vote[]
+  assignment      Assignment?
+  completionProof CompletionProof?
+  statusHistory   StatusHistory[]
+  notifications   Notification[]
+
+  @@index([status])
+  @@index([categoryId])
+  @@index([lat, lng])
+  @@index([kecamatan])
+}
+
+model Vote {
+  id        String   @id @default(uuid())
+  reportId  String
+  userId    String
+  createdAt DateTime @default(now())
+
+  report Report @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([reportId, userId])
+  @@index([reportId])
+}
+
+model Assignment {
+  id         String   @id @default(uuid())
+  reportId   String   @unique
+  unit       String   // mis. "Dinas PUPR Bandar Lampung (Tim Reaksi Cepat 04)"
+  catatan    String?
+  assignedAt DateTime @default(now())
+
+  report Report @relation(fields: [reportId], references: [id], onDelete: Cascade)
+}
+
+model CompletionProof {
+  id        String   @id @default(uuid())
+  reportId  String   @unique
+  fotoUrl   String
+  catatan   String
+  selesaiAt DateTime @default(now())
+
+  report Report @relation(fields: [reportId], references: [id], onDelete: Cascade)
+}
+
+model StatusHistory {
+  id        String   @id @default(uuid())
+  reportId  String
+  dari      String
+  ke        String
+  catatan   String?
+  olehId    String?
+  createdAt DateTime @default(now())
+
+  report Report @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  oleh   User?   @relation("UserStatusChanges", fields: [olehId], references: [id], onDelete: SetNull)
+
+  @@index([reportId])
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  reportId  String?
+  pesan     String
+  dibaca    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  report Report? @relation(fields: [reportId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+

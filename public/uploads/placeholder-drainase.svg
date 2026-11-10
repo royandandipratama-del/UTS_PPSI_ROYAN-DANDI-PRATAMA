@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 800 600">
+  <rect width="800" height="600" fill="#1e293b"/>
+  <!-- Saluran Air Got -->
+  <rect x="150" y="250" width="500" height="280" fill="#0f172a" stroke="#475569" stroke-width="6"/>
+  <!-- Air Kotor Menggenang -->
+  <rect x="160" y="360" width="480" height="160" fill="#3f3f46"/>
+  <!-- Sampah Menyumbat -->
+  <ellipse cx="280" cy="380" rx="40" ry="20" fill="#71717a"/>
+  <rect x="360" y="370" width="80" height="30" rx="6" fill="#854d0e"/>
+  <ellipse cx="480" cy="390" rx="50" ry="25" fill="#52525b"/>
+  <rect x="40" y="40" width="340" height="48" rx="8" fill="#0284c7" opacity="0.9"/>
+  <text x="56" y="72" fill="#ffffff" font-family="sans-serif" font-size="20" font-weight="bold">DRAINASE TERSUMBAT SAMPAH</text>
+  <text x="40" y="565" fill="#94a3b8" font-family="sans-serif" font-size="18">LaporWarga Saluran Air Tersumbat - Bandar Lampung</text>
+</svg>
+
