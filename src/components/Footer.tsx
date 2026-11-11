@@ -1,4 +1,5 @@
 import React from "react";
+import Image from "next/image";
 import Link from "next/link";
 
 export default function Footer() {
@@ -76,18 +77,28 @@ export default function Footer() {
             <p className="text-sm text-gray-400 mb-4 leading-relaxed">
               Inisiatif pengembangan sistem civic crowdsourcing hasil kolaborasi riset akademik dan tata kelola smart city.
             </p>
-            <div className="grid grid-cols-2 gap-3">
-              {/* Placeholder Logo Pemda */}
-              <div className="h-16 rounded-xl bg-gray-800 border border-gray-700 p-2 flex flex-col items-center justify-center text-center">
-                <span className="material-symbols-outlined text-primary-fixed !text-2xl">location_city</span>
-                <span className="text-[11px] font-semibold text-gray-200 mt-1">Logo Pemda</span>
-                <span className="text-[9px] text-gray-400">Pemerintah Kota</span>
+            <div className="flex flex-row items-center justify-start gap-4 flex-wrap">
+              {/* Logo Pemerintah Kota */}
+              <div className="h-14 rounded-xl bg-white/10 border border-gray-700 px-3 py-2 flex items-center justify-center">
+                <Image
+                  src="/logo-pemda.png"
+                  alt="Logo Pemerintah Kota Bandar Lampung"
+                  width={120}
+                  height={48}
+                  className="h-10 w-auto object-contain"
+                  style={{ maxHeight: "40px" }}
+                />
               </div>
-              {/* Placeholder Logo Universitas Teknokrat Indonesia */}
-              <div className="h-16 rounded-xl bg-gray-800 border border-gray-700 p-2 flex flex-col items-center justify-center text-center">
-                <span className="material-symbols-outlined text-yellow-400 !text-2xl">school</span>
-                <span className="text-[11px] font-semibold text-gray-200 mt-1">Logo Universitas</span>
-                <span className="text-[9px] text-gray-400">Teknokrat Indonesia</span>
+              {/* Logo Universitas Teknokrat Indonesia */}
+              <div className="h-14 rounded-xl bg-white/10 border border-gray-700 px-3 py-2 flex items-center justify-center">
+                <Image
+                  src="/logo-uti.png"
+                  alt="Logo Universitas Teknokrat Indonesia"
+                  width={120}
+                  height={48}
+                  className="h-10 w-auto object-contain"
+                  style={{ maxHeight: "40px" }}
+                />
               </div>
             </div>
           </div>
